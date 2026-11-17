@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Deerkill Bus Counselor Training</title>
+<style>
+  :root { --purple:#462770; --purple-dark:#1E1040; --purple-light:#EDE8F5; --gold:#F5A623; --gold-light:#FEF3DC;
+          --cream:#FAF8F3; --border:#E5E0D8; --ink:#1A1A1A; --muted:#7A7268; --red:#EF4444; --green:#22C55E; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; background:var(--cream); color:var(--ink); }
+  header { background:var(--purple); color:#fff; padding:18px 16px 16px; }
+  header h1 { margin:0; font-size:20px; }
+  header p { margin:4px 0 0; opacity:.85; font-size:14px; }
+  main { max-width:480px; margin:0 auto; padding:16px; }
+  .card { background:#fff; border:2px solid var(--border); border-radius:10px; padding:16px; margin-bottom:14px; }
+  .note { font-size:14px; color:var(--muted); }
+  label { display:block; font-weight:700; margin:12px 0 6px; }
+  input { width:100%; font:inherit; font-size:18px; padding:12px; border:2px solid var(--border); border-radius:8px; }
+  button { font:inherit; font-weight:700; min-height:48px; padding:0 18px; border-radius:8px; border:none; cursor:pointer; }
+  .primary { background:var(--gold); color:var(--purple); width:100%; margin-top:12px; }
+  .link { background:none; color:var(--purple); text-decoration:underline; min-height:44px; font-weight:600; }
+  .match { display:block; width:100%; text-align:left; background:var(--purple-light); color:var(--purple-dark); margin-top:8px; }
+  .err { color:#B91C1C; font-weight:600; margin-top:10px; }
+  .chip { display:inline-block; background:var(--gold); color:var(--purple); border-radius:12px; padding:2px 10px; font-size:13px; font-weight:700; margin-top:8px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Deerkill Bus Counselor Training</h1>
+  <p id="greeting">Sign in to begin</p>
+  <span class="chip" id="pathChip" hidden></span>
+</header>
+<main>
+  <div class="card" id="loading">Loading…</div>
+
+  <section id="signin" hidden>
+    <div class="card">
+      <strong>Find your name</strong>
+      <p class="note">Use the personal link we sent you if you have it. Otherwise type your first name and last initial (like “Sam K”), then your phone’s last 4 digits.</p>
+      <label for="q">First name and last initial</label>
+      <input id="q" autocomplete="off" autocapitalize="words" inputmode="text">
+      <div id="matches"></div>
+      <div id="last4Box" hidden>
+        <label for="last4">Last 4 digits of your phone number</label>
+        <input id="last4" inputmode="numeric" maxlength="4" autocomplete="off">
+        <button class="primary" id="go">Sign in</button>
+      </div>
+      <div class="err" id="err" role="alert"></div>
+    </div>
+    <p class="note">This is separate from the Bus Comms app. Signing in here won’t log you out of your bus.</p>
+  </section>
+
+  <section id="home" hidden>
+    <div class="card"><strong>You’re signed in.</strong>
+      <p class="note">Your training modules will appear here.</p></div>
+    <button class="link" id="signout">Not you? Sign out</button>
+  </section>
+</main>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  'use strict';
+  const KEY = 'dkTrain_session', OPENED = 'dkTrain_opened';
+  const $ = id => document.getElementById(id);
+  let pickedId = null;
+
+  const call = (action, data) => fetch(window.TRAIN_API, {
+    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ action }, data)),
+  }).then(r => r.json());
+
+  const loadSession = () => {
+    try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.exp > Date.now()) return s; } catch (e) {}
+    localStorage.removeItem(KEY); return null;
+  };
+  const show = id => { for (const s of ['loading', 'signin', 'home']) $(s).hidden = s !== id; };
+  const showHome = p => {
+    $('greeting').textContent = 'Hi, ' + p.name;
+    $('pathChip').textContent = p.path === 'returning' ? 'Returning counselor' : 'New counselor';
+    $('pathChip').hidden = p.path !== 'returning';
+    show('home');
+  };
+  const store = r => localStorage.setItem(KEY, JSON.stringify({ token: r.session.token, exp: r.session.exp }));
+  const showSignin = msg => { show('signin'); $('err').textContent = msg || ''; };
+
+  async function boot() {
+    const m = /^#k=([0-9a-f]{64})$/.exec(location.hash);
+    if (m) {
+      history.replaceState(null, '', location.pathname + location.search); // token never stays in the address bar
+      try {
+        const r = await call('exchange', { token: m[1] });
+        if (r.ok) { store(r); sessionStorage.setItem(OPENED, '1'); return showHome(r); }
+        return showSignin('That link is no longer valid. Find your name below, or ask camp for a new link.');
+      } catch (e) { return showSignin('Could not reach the training server. Check your connection and try again.'); }
+    }
+    const s = loadSession();
+    if (!s) return showSignin();
+    try {
+      const r = await call('me', { session: s.token });
+      if (!r.ok) { localStorage.removeItem(KEY); return showSignin('Please sign in again.'); }
+      if (!sessionStorage.getItem(OPENED)) { sessionStorage.setItem(OPENED, '1'); call('open', { session: s.token }).catch(() => {}); }
+      showHome(r);
+    } catch (e) { showSignin('Could not reach the training server. Check your connection and try again.'); }
+  }
+
+  let t = null;
+  $('q').addEventListener('input', () => {
+    clearTimeout(t); pickedId = null; $('last4Box').hidden = true;
+    const q = $('q').value.trim();
+    if (q.length < 2) { $('matches').textContent = ''; return; }
+    t = setTimeout(async () => {
+      try {
+        const r = await call('search', { q });
+        const box = $('matches'); box.textContent = '';
+        if (!r.ok) { $('err').textContent = 'Too many tries right now. Please wait a few minutes.'; return; }
+        $('err').textContent = '';
+        r.matches.forEach(m => {
+          const b = document.createElement('button');
+          b.className = 'match'; b.textContent = m.label;
+          b.onclick = () => { pickedId = m.id; $('last4Box').hidden = false; $('last4').focus(); };
+          box.appendChild(b);
+        });
+        if (!r.matches.length) box.textContent = 'No match. Check the spelling, or ask camp for your link.';
+      } catch (e) { $('err').textContent = 'Could not reach the training server.'; }
+    }, 300);
+  });
+
+  $('go').addEventListener('click', async () => {
+    $('err').textContent = '';
+    try {
+      const r = await call('signin', { id: pickedId, last4: $('last4').value.trim() });
+      if (r.ok) { store(r); sessionStorage.setItem(OPENED, '1'); return showHome(r); }
+      $('err').textContent = r.error === 'locked'
+        ? (r.dayLocked ? 'Too many tries today. Please use your personal link or try again tomorrow.'
+                       : 'Too many tries. Please wait ' + (r.minutes || 15) + ' minutes and try again.')
+        : r.error === 'busy' ? 'Too many tries right now. Please wait a few minutes.'
+        : 'Those digits didn’t match. Try again.';
+    } catch (e) { $('err').textContent = 'Could not reach the training server.'; }
+  });
+
+  $('signout').addEventListener('click', () => {
+    localStorage.removeItem(KEY); sessionStorage.removeItem(OPENED);
+    $('greeting').textContent = 'Sign in to begin'; $('pathChip').hidden = true; $('q').value = '';
+    $('matches').textContent = ''; $('last4Box').hidden = true; showSignin();
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
