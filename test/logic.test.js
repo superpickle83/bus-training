@@ -81,6 +81,9 @@ p = plan(rows4, p.staff);
 assert(p.staff.find(s => s.email === 'cy@x.org').active === 'No', 'removed row → inactive');
 assert(p.warnings.some(w => /same email/.test(w)));
 
+ctx.__nb = [{ staffId: 'z', displayName: 'Sami Gold', bus: 'NONE', active: 'Yes' }];
+assert.deepStrictEqual(run('matchNames_(__nb, "sa")').map(x => x.label), ['Sami G.'], 'bus NONE is hidden');
+
 // Stage 2: lockout
 const s0 = staff[0];
 const L4 = '0101';

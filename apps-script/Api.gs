@@ -64,7 +64,8 @@ function matchNames_(staff, q) {
   }).slice(0, 10).map(function (s) {
     var n = String(s.displayName).split(/\s+/);
     var name = n[0] + (n.length > 1 ? ' ' + n[n.length - 1].charAt(0).toUpperCase() + '.' : '');
-    return { id: s.staffId, label: s.bus ? name + ' · Bus ' + s.bus : name }; // bus # tells two "Sam K."s apart
+    var hasBus = s.bus && !/^(none|n\/a|na|-)$/i.test(String(s.bus).trim());
+    return { id: s.staffId, label: hasBus ? name + ' · Bus ' + s.bus : name }; // bus # tells two "Sam K."s apart
   });
 }
 
