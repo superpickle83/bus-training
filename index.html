@@ -6,32 +6,73 @@
 <meta name="robots" content="noindex">
 <title>Deerkill Bus Counselor Training</title>
 <style>
-  :root { --purple:#462770; --purple-dark:#1E1040; --purple-light:#EDE8F5; --gold:#F5A623; --gold-light:#FEF3DC;
-          --cream:#FAF8F3; --border:#E5E0D8; --ink:#1A1A1A; --muted:#7A7268; --red:#EF4444; --green:#22C55E; }
+  :root { --purple:#462770; --purple-dark:#1E1040; --purple-mid:#5C3690; --purple-light:#EDE8F5; --gold:#F5A623; --gold-light:#FEF3DC;
+          --cream:#FAF8F3; --border:#E5E0D8; --ink:#1A1A1A; --muted:#7A7268; --green:#16A34A; --green-light:#DCFCE7; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; background:var(--cream); color:var(--ink); }
-  header { background:var(--purple); color:#fff; padding:18px 16px 16px; }
-  header h1 { margin:0; font-size:20px; }
-  header p { margin:4px 0 0; opacity:.85; font-size:14px; }
-  main { max-width:480px; margin:0 auto; padding:16px; }
-  .card { background:#fff; border:2px solid var(--border); border-radius:10px; padding:16px; margin-bottom:14px; }
-  .note { font-size:14px; color:var(--muted); }
-  label { display:block; font-weight:700; margin:12px 0 6px; }
-  input { width:100%; font:inherit; font-size:18px; padding:12px; border:2px solid var(--border); border-radius:8px; }
-  button { font:inherit; font-weight:700; min-height:48px; padding:0 18px; border-radius:8px; border:none; cursor:pointer; }
-  .primary { background:var(--gold); color:var(--purple); width:100%; margin-top:12px; }
-  .link { background:none; color:var(--purple); text-decoration:underline; min-height:44px; font-weight:600; }
+  header { background:var(--purple); color:#fff; padding:14px 16px 12px; }
+  header h1 { margin:0; font-size:19px; line-height:1.2; }
+  .sub { margin:2px 0 0; opacity:.85; font-size:13px; }
+  .chip { display:inline-block; background:var(--gold); color:var(--purple); border-radius:12px; padding:1px 10px; font-size:12px; font-weight:700; margin-left:6px; }
+  .bar { height:8px; background:rgba(255,255,255,.25); border-radius:4px; margin:10px 0 4px; overflow:hidden; }
+  .bar > i { display:block; height:100%; background:var(--gold); border-radius:4px; }
+  .prog { display:flex; justify-content:space-between; font-size:13px; }
+  main { max-width:480px; margin:0 auto; padding:12px 14px 16px; }
+  .card { background:#fff; border:2px solid var(--border); border-radius:10px; padding:14px; margin-bottom:10px; }
+  .card h2 { margin:0 0 4px; font-size:16px; }
+  .note { font-size:13px; color:var(--muted); }
+  label { display:block; font-weight:700; margin:10px 0 6px; }
+  input[type=text], input:not([type]) { width:100%; font:inherit; font-size:18px; padding:12px; border:2px solid var(--border); border-radius:8px; }
+  button { font:inherit; font-weight:700; min-height:44px; padding:0 16px; border-radius:8px; border:none; cursor:pointer; }
+  .primary { background:var(--gold); color:var(--purple); width:100%; margin-top:10px; }
+  .link { background:none; color:var(--purple); text-decoration:underline; font-weight:600; padding:0 4px; }
   .match { display:block; width:100%; text-align:left; background:var(--purple-light); color:var(--purple-dark); margin-top:8px; }
-  .err { color:#B91C1C; font-weight:600; margin-top:10px; }
-  .chip { display:inline-block; background:var(--gold); color:var(--purple); border-radius:12px; padding:2px 10px; font-size:13px; font-weight:700; margin-top:8px; }
+  .err { color:#B91C1C; font-weight:600; margin-top:8px; }
+  .next { border-color:var(--gold); background:var(--gold-light); }
+  .steps { display:flex; gap:6px; margin:8px 0 2px; flex-wrap:wrap; }
+  .st { font-size:12px; font-weight:700; padding:3px 9px; border-radius:10px; background:#fff; border:1px solid var(--border); color:var(--muted); }
+  .st.done { background:var(--green-light); border-color:#86EFAC; color:#166534; }
+  .st.cur { background:var(--purple); border-color:var(--purple); color:#fff; }
+  .row { display:flex; align-items:center; gap:8px; min-height:44px; width:100%; padding:6px 10px; border-radius:8px; background:#fff; color:var(--ink); border:1px solid var(--border); margin-bottom:6px; font-size:14px; text-align:left; }
+  .row .t { flex:1; font-weight:600; }
+  .row .m { font-size:12px; color:var(--muted); white-space:nowrap; }
+  .row.cur { border:2px solid var(--purple); background:var(--purple-light); }
+  .row.done { background:var(--green-light); border-color:#BBF7D0; }
+  .row .go { min-height:36px; padding:0 12px; font-size:13px; background:var(--purple); color:#fff; }
+  .tag { font-size:11px; font-weight:800; padding:1px 7px; border-radius:8px; background:var(--gold); color:var(--purple); white-space:nowrap; }
+  .partline { display:flex; justify-content:space-between; align-items:center; min-height:44px; width:100%; background:#fff; border:1px solid var(--border); color:var(--ink); margin-bottom:6px; text-align:left; font-size:14px; }
+  .partline.done { background:var(--green-light); border-color:#BBF7D0; }
+  .parthead { font-size:12px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--purple); margin:8px 2px 6px; }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+  .absent { background:#fff; border:2px solid var(--purple); color:var(--purple); min-height:44px; }
+  .sheet { background:#fff; border:2px solid var(--purple); border-radius:10px; padding:14px; margin-top:8px; }
+  .sheet .btnrow { display:flex; gap:8px; }
+  .sheet .btnrow a { flex:1; display:flex; align-items:center; justify-content:center; min-height:48px; border-radius:8px; background:var(--purple); color:#fff; font-weight:700; text-decoration:none; }
+  .sheet .small { font-size:13px; }
+  .seg { display:flex; gap:8px; margin:8px 0; }
+  .seg button { flex:1; background:var(--purple-light); color:var(--purple-dark); }
+  .seg button[aria-pressed=true] { background:var(--purple); color:#fff; }
+  .formbtn { display:flex; align-items:center; justify-content:center; min-height:48px; border-radius:8px; background:var(--gold); color:var(--purple); font-weight:800; text-decoration:none; }
+  .cert { text-align:center; background:#fff; border:6px double var(--gold); border-radius:12px; padding:28px 16px; }
+  .cert h2 { color:var(--purple); font-size:22px; margin:0 0 6px; }
+  .cert .who { font-size:26px; font-weight:800; color:var(--purple-dark); margin:14px 0 4px; }
+  .cert .big { font-size:34px; font-weight:800; color:var(--gold); margin:10px 0; }
+  .wn { padding:10px 0; border-bottom:1px solid var(--border); }
+  .wn:last-child { border-bottom:none; }
+  .wn b { display:block; }
   [hidden] { display:none !important; }
+  .banner { background:var(--gold); color:var(--purple); text-align:center; font-weight:700; font-size:13px; padding:4px; }
 </style>
 </head>
 <body>
+<div class="banner" id="previewBanner" hidden>Preview — sample data, nothing is saved</div>
 <header>
-  <h1>Deerkill Bus Counselor Training</h1>
-  <p id="greeting">Sign in to begin</p>
-  <span class="chip" id="pathChip" hidden></span>
+  <h1 id="greeting">Deerkill Bus Counselor Training</h1>
+  <p class="sub" id="subline">Sign in to begin</p>
+  <div id="progWrap" hidden>
+    <div class="bar"><i id="barFill" style="width:0"></i></div>
+    <div class="prog"><span id="progText"></span><span id="dueText"></span></div>
+  </div>
 </header>
 <main>
   <div class="card" id="loading">Loading…</div>
@@ -41,7 +82,7 @@
       <strong>Find your name</strong>
       <p class="note">Use the personal link we sent you if you have it. Otherwise type your first name and last initial (like “Sam K”), then your phone’s last 4 digits.</p>
       <label for="q">First name and last initial</label>
-      <input id="q" autocomplete="off" autocapitalize="words" inputmode="text">
+      <input id="q" autocomplete="off" autocapitalize="words">
       <div id="matches"></div>
       <div id="last4Box" hidden>
         <label for="last4">Last 4 digits of your phone number</label>
@@ -54,59 +95,283 @@
   </section>
 
   <section id="home" hidden>
-    <div class="card"><strong>You’re signed in.</strong>
-      <p class="note">Your training modules will appear here.</p></div>
-    <button class="link" id="signout">Not you? Sign out</button>
+    <div id="homeBody"></div>
+    <div class="foot">
+      <button class="absent" id="absentBtn" aria-expanded="false" aria-controls="absentSheet">Going to be absent?</button>
+      <button class="link" id="signout">Not you? Sign out</button>
+    </div>
+    <div class="sheet" id="absentSheet" hidden></div>
   </section>
+
+  <section id="detail" hidden></section>
 </main>
 
 <script src="config.js"></script>
+<script src="modules.js"></script>
 <script>
 (function () {
   'use strict';
   const KEY = 'dkTrain_session', OPENED = 'dkTrain_opened';
+  const FORM_URL = 'https://superpickle83.github.io/staffattendance/';
   const $ = id => document.getElementById(id);
-  let pickedId = null;
+  const params = new URLSearchParams(location.search);
+  const PREVIEW = params.get('preview');          // 0 | mid | full — sample data, no network
+  let pickedId = null, state = null, session = null;
+  const view = { showDone: false, showMore: false, openParts: {} };
+
+  const h = (tag, attrs, ...kids) => {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (k === 'class') el.className = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) el.setAttribute(k, v === true ? '' : v);
+    }
+    kids.flat().forEach(c => { if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(c)); });
+    return el;
+  };
 
   const call = (action, data) => fetch(window.TRAIN_API, {
     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(Object.assign({ action }, data)),
   }).then(r => r.json());
 
+  // ── progress model ────────────────────────────────────
+  const modulesFor = path => (path === 'returning' ? [window.TRAIN_WHATSNEW] : []).concat(window.TRAIN_MODULES);
+  const prog = st => { const m = new Map(); st.progress.forEach(r => m.set(r.moduleId + ':' + r.step, r)); return m; };
+  const stepDone = (p, m, s) => { const r = p.get(m.id + ':' + s); return !!r && r.status === 'done'; };
+  const isDone = (p, m) => m.steps.every(s => stepDone(p, m, s));
+  const minutesLeft = (p, m) => Math.max(1, Math.ceil(m.minutes * m.steps.filter(s => !stepDone(p, m, s)).length / m.steps.length));
+  const STEP_LABEL = { read: 'Read', watch: 'Watch', check: 'Check', do: 'Do' };
+
+  function summarize(st) {
+    const p = prog(st), mods = modulesFor(st.path), req = mods.filter(m => !m.bonus);
+    const done = req.filter(m => isDone(p, m));
+    const next = req.find(m => !isDone(p, m)) || null;
+    return { p, mods, req, done, next };
+  }
+
+  function daysLeft(due) {
+    const [y, mo, d] = due.split('-').map(Number);
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((new Date(y, mo - 1, d) - t) / 86400000);
+  }
+  const dueLabel = due => {
+    const [y, mo, d] = due.split('-').map(Number);
+    const month = new Date(y, mo - 1, d).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    const n = daysLeft(due);
+    return (n > 1 ? `Due in ${n} days` : n === 1 ? 'Due tomorrow' : n === 0 ? 'Due today' : 'Past due') + ' · ' + month;
+  };
+
+  // ── home ──────────────────────────────────────────────
+  function newIds(st) { return new Set(st.whatsnew.map(w => w.moduleId)); }
+
+  function moduleRow(st, sm, m, cur, nw) {
+    const done = isDone(sm.p, m);
+    const started = m.steps.some(s => stepDone(sm.p, m, s));
+    const kids = [
+      h('span', { 'aria-hidden': 'true' }, done ? '✓' : cur ? '▶' : '○'),
+      h('span', { class: 't' }, m.title),
+      (nw.has(m.id) || m.isNew) && !done ? h('span', { class: 'tag' }, 'New for 2027') : null,
+      h('span', { class: 'm' }, done ? 'Done' : started ? 'In progress' : m.minutes + ' min')];
+    const cls = 'row' + (cur ? ' cur' : '') + (done ? ' done' : '');
+    // Whole row is the tap target (≥44px); finished rows are plain text.
+    return done ? h('div', { class: cls }, kids)
+      : h('button', { class: cls, onclick: () => go('/m/' + m.id), 'aria-label': (started ? 'Continue ' : 'Start ') + m.title }, kids);
+  }
+
+  function partBlock(st, sm, part, nw) {
+    const mods = sm.mods.filter(m => m.part === part);
+    const req = mods.filter(m => !m.bonus), bonus = mods.filter(m => m.bonus);
+    const doneN = req.filter(m => isDone(sm.p, m)).length;
+    const finished = doneN === req.length;
+    const active = sm.next && sm.next.part === part;
+    const label = window.TRAIN_PARTS[part];
+    const frag = h('div', {});
+
+    if (finished || !active) {
+      const open = !!view.openParts[part];
+      frag.append(h('button', { class: 'partline' + (finished ? ' done' : ''), 'aria-expanded': String(open),
+        onclick: () => { view.openParts[part] = !open; renderHome(); } },
+        h('span', {}, (finished ? '✓ ' : '') + label), h('span', { class: 'm' }, `${doneN} of ${req.length} · ${open ? 'hide' : 'show'}`)));
+      if (open) mods.forEach(m => frag.append(moduleRow(st, sm, m, false, nw)));
+      return frag;
+    }
+
+    frag.append(h('div', { class: 'parthead' }, label));
+    const doneMods = req.filter(m => isDone(sm.p, m));
+    if (doneMods.length) {
+      frag.append(h('button', { class: 'partline done', 'aria-expanded': String(view.showDone),
+        onclick: () => { view.showDone = !view.showDone; renderHome(); } },
+        h('span', {}, `${doneMods.length} completed`), h('span', { class: 'm' }, view.showDone ? 'hide' : 'show')));
+      if (view.showDone) doneMods.forEach(m => frag.append(moduleRow(st, sm, m, false, nw)));
+    }
+    const upcoming = req.filter(m => !isDone(sm.p, m) && m !== sm.next);
+    frag.append(moduleRow(st, sm, sm.next, true, nw));
+    const shown = view.showMore ? upcoming : upcoming.slice(0, 2);
+    shown.forEach(m => frag.append(moduleRow(st, sm, m, false, nw)));
+    if (upcoming.length > 2) {
+      frag.append(h('button', { class: 'partline', 'aria-expanded': String(view.showMore),
+        onclick: () => { view.showMore = !view.showMore; renderHome(); } },
+        h('span', {}, view.showMore ? 'Show fewer modules' : `Show ${upcoming.length - 2} more modules`), h('span', { class: 'm' }, '')));
+    }
+    bonus.forEach(m => frag.append(moduleRow(st, sm, m, false, nw)));
+    return frag;
+  }
+
+  function renderHome() {
+    const st = state, sm = summarize(st), nw = newIds(st);
+    $('greeting').textContent = 'Hi, ' + st.name;
+    $('subline').textContent = '';
+    if (st.path === 'returning') $('subline').append('Welcome back', h('span', { class: 'chip' }, 'Returning counselor'));
+    else $('subline').textContent = 'Bus counselor training';
+    const N = sm.req.length, n = sm.done.length;
+    $('progWrap').hidden = false;
+    $('barFill').style.width = (N ? Math.round(100 * n / N) : 0) + '%';
+    $('progText').textContent = `${n} of ${N} required`;
+    $('dueText').textContent = dueLabel(st.dueDate);
+
+    const body = $('homeBody'); body.textContent = '';
+    if (!sm.next) {
+      body.append(h('div', { class: 'card next' }, h('h2', {}, '🎉 You finished!'),
+        h('p', { class: 'note' }, `All ${N} required modules are done. Show your certificate at orientation check-in.`),
+        h('button', { class: 'primary', onclick: () => go('/certificate') }, 'View my certificate')));
+    } else {
+      const m = sm.next, started = m.steps.some(s => stepDone(sm.p, m, s));
+      const curStep = m.steps.find(s => !stepDone(sm.p, m, s));
+      const testFirst = st.path === 'returning' && m.testOut && !started && !(nw.has(m.id) || m.isNew);
+      body.append(h('div', { class: 'card next' },
+        h('div', { class: 'note' }, 'UP NEXT'),
+        h('h2', {}, m.title, (nw.has(m.id) || m.isNew) ? h('span', { class: 'tag', style: 'margin-left:8px' }, 'New for 2027') : null),
+        h('div', { class: 'steps' }, m.steps.map(s => h('span', { class: 'st' + (stepDone(sm.p, m, s) ? ' done' : s === curStep ? ' cur' : '') },
+          (stepDone(sm.p, m, s) ? '✓ ' : '') + STEP_LABEL[s]))),
+        h('div', { class: 'note' }, `About ${minutesLeft(sm.p, m)} min left`),
+        h('button', { class: 'primary', onclick: () => go('/m/' + m.id) }, testFirst ? 'Show what you know' : started ? 'Continue' : 'Start')));
+    }
+    [1, 2].forEach(part => { if (sm.mods.some(m => m.part === part)) body.append(partBlock(st, sm, part, nw)); });
+  }
+
+  // ── absence panel ─────────────────────────────────────
+  let urgent = false;
+  function renderAbsent() {
+    const s = $('absentSheet'); s.textContent = '';
+    s.append(
+      h('strong', {}, 'Going to be absent?'),
+      h('p', { class: 'note', style: 'margin:6px 0' }, 'Step 1 — every absence, no exceptions:'),
+      h('a', { class: 'formbtn', href: FORM_URL, target: '_blank', rel: 'noopener' }, 'Fill out the absence form'),
+      h('p', { class: 'note', style: 'margin:12px 0 4px' }, 'When is the absence?'),
+      h('div', { class: 'seg' },
+        h('button', { 'aria-pressed': String(!urgent), onclick: () => { urgent = false; renderAbsent(); } }, '24+ hours away'),
+        h('button', { 'aria-pressed': String(urgent), onclick: () => { urgent = true; renderAbsent(); } }, 'Under 24 hours')));
+    if (urgent) {
+      s.append(h('p', { style: 'margin:8px 0;font-weight:700;color:#B91C1C' }, 'Step 2 — You must ALSO call or text camp. The form alone isn’t enough.'),
+        h('div', { class: 'btnrow' }, h('a', { href: 'tel:8453541466' }, 'Call camp'), h('a', { href: 'sms:8454183337' }, 'Text camp')),
+        h('p', { class: 'small note', style: 'margin:8px 0 0' }, 'Or email ', h('a', { href: 'mailto:directors@deerkilldaycamp.com' }, 'directors@deerkilldaycamp.com')));
+    }
+    s.append(h('p', { class: 'small note', style: 'margin:10px 0 0' }, 'Calling or texting doesn’t replace the form.'));
+  }
+  $('absentBtn').addEventListener('click', () => {
+    const open = $('absentSheet').hidden;
+    $('absentSheet').hidden = !open; $('absentBtn').setAttribute('aria-expanded', String(open));
+    if (open) renderAbsent();
+  });
+
+  // ── detail screens ────────────────────────────────────
+  function backBtn() { return h('button', { class: 'link', onclick: () => go('/') }, '← Back to my training'); }
+
+  function renderDetail(route) {
+    const d = $('detail'); d.textContent = '';
+    const sm = summarize(state);
+    if (route === '/certificate') {
+      if (sm.next) { return go('/'); }
+      const when = new Date(Math.max(0, ...state.progress.map(r => Date.parse(r.completedAt) || 0)) || Date.now())
+        .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      d.append(backBtn(), h('div', { class: 'cert' },
+        h('div', { class: 'note' }, 'DEERKILL DAY CAMP'), h('h2', {}, 'Bus Counselor Training'),
+        h('div', { class: 'note' }, 'This certifies that'), h('div', { class: 'who' }, state.fullName),
+        h('div', { class: 'note' }, 'has completed all required modules'),
+        h('div', { class: 'big' }, `${sm.done.length} of ${sm.req.length}`), h('div', {}, when),
+        h('p', { class: 'note' }, 'Show this screen at orientation check-in.')));
+      return;
+    }
+    const m = /^\/m\/([a-z0-9-]+)$/.exec(route);
+    const mod = m && sm.mods.find(x => x.id === m[1]);
+    if (!mod) return go('/');
+    if (mod.id === 'whatsnew') {
+      d.append(backBtn(), h('div', { class: 'card' }, h('h2', {}, "What's new since last summer"),
+        state.whatsnew.length ? state.whatsnew.map(w => h('div', { class: 'wn' }, h('b', {}, w.item), h('span', { class: 'note' }, w.description),
+          document.createTextNode(' '), window.TRAIN_MODULES.some(x => x.id === w.moduleId)
+            ? h('button', { class: 'link', onclick: () => go('/m/' + w.moduleId) }, 'See where it’s taught') : null))
+          : h('p', { class: 'note' }, 'No changes have been listed yet.'),
+        h('button', { class: 'primary', onclick: markWhatsNew }, isDone(sm.p, mod) ? 'Back' : 'I’ve read this')));
+      return;
+    }
+    d.append(backBtn(), h('div', { class: 'card' }, h('h2', {}, mod.title),
+      h('p', { class: 'note' }, 'This module is still being built. It will appear here once its video, check questions and practice are ready.')));
+  }
+
+  async function markWhatsNew() {
+    if (!PREVIEW) { try { await call('step', { session: session.token, moduleId: 'whatsnew', step: 'read' }); } catch (e) {} }
+    if (!state.progress.some(r => r.moduleId === 'whatsnew')) state.progress.push({ moduleId: 'whatsnew', step: 'read', status: 'done', completedAt: new Date().toISOString() });
+    go('/');
+  }
+
+  // ── routing & screens ─────────────────────────────────
+  const show = id => { for (const s of ['loading', 'signin', 'home', 'detail']) $(s).hidden = s !== id; };
+  function go(route) { location.hash = route === '/' ? '' : '#' + route; route_(); }
+  function route_() {
+    if (!state) return;
+    const r = location.hash.startsWith('#/') ? location.hash.slice(1) : '/';
+    if (r === '/') { show('home'); renderHome(); return; }
+    show('detail'); renderDetail(r); window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route_);
+
   const loadSession = () => {
     try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.exp > Date.now()) return s; } catch (e) {}
     localStorage.removeItem(KEY); return null;
   };
-  const show = id => { for (const s of ['loading', 'signin', 'home']) $(s).hidden = s !== id; };
-  const showHome = p => {
-    $('greeting').textContent = 'Hi, ' + p.name;
-    $('pathChip').textContent = p.path === 'returning' ? 'Returning counselor' : 'New counselor';
-    $('pathChip').hidden = p.path !== 'returning';
-    show('home');
-  };
   const store = r => localStorage.setItem(KEY, JSON.stringify({ token: r.session.token, exp: r.session.exp }));
-  const showSignin = msg => { show('signin'); $('err').textContent = msg || ''; };
+  const showSignin = msg => { state = null; $('progWrap').hidden = true; $('greeting').textContent = 'Deerkill Bus Counselor Training';
+    $('subline').textContent = 'Sign in to begin'; show('signin'); $('err').textContent = msg || ''; };
+
+  async function enter(sess) {
+    session = sess;
+    try {
+      const r = await call('home', { session: sess.token });
+      if (!r.ok) { localStorage.removeItem(KEY); return showSignin('Please sign in again.'); }
+      state = r; route_();
+    } catch (e) { showSignin('Could not reach the training server. Check your connection and try again.'); }
+  }
+
+  function previewState() {
+    const path = params.get('path') === 'returning' ? 'returning' : 'new';
+    const mods = modulesFor(path).filter(m => !m.bonus);
+    const count = PREVIEW === 'full' ? mods.length : PREVIEW === 'mid' ? 6 : 0;
+    const progress = [];
+    mods.slice(0, count).forEach(m => m.steps.forEach(s => progress.push({ moduleId: m.id, step: s, status: 'done', completedAt: '2027-05-20T12:00:00Z' })));
+    if (PREVIEW === 'mid') progress.push({ moduleId: mods[count].id, step: mods[count].steps[0], status: 'done', completedAt: '2027-05-21T12:00:00Z' });
+    return { ok: true, name: 'Alex', fullName: 'Alex Sample', path, bus: '7', progress, dueDate: '2027-06-19',
+      whatsnew: [{ item: '"All Done" button', description: 'Tap it after the last drop-off.', moduleId: 'p2-alldone' },
+                 { item: 'Staff absence procedure', description: 'Form always; under 24 hours also call or text.', moduleId: 'p1-welcome' }] };
+  }
 
   async function boot() {
+    if (PREVIEW) { $('previewBanner').hidden = false; state = previewState(); route_(); return; }
     const m = /^#k=([0-9a-f]{64})$/.exec(location.hash);
     if (m) {
       history.replaceState(null, '', location.pathname + location.search); // token never stays in the address bar
       try {
         const r = await call('exchange', { token: m[1] });
-        if (r.ok) { store(r); sessionStorage.setItem(OPENED, '1'); return showHome(r); }
+        if (r.ok) { store(r); sessionStorage.setItem(OPENED, '1'); return enter(r.session); }
         return showSignin('That link is no longer valid. Find your name below, or ask camp for a new link.');
       } catch (e) { return showSignin('Could not reach the training server. Check your connection and try again.'); }
     }
     const s = loadSession();
     if (!s) return showSignin();
-    try {
-      const r = await call('me', { session: s.token });
-      if (!r.ok) { localStorage.removeItem(KEY); return showSignin('Please sign in again.'); }
-      if (!sessionStorage.getItem(OPENED)) { sessionStorage.setItem(OPENED, '1'); call('open', { session: s.token }).catch(() => {}); }
-      showHome(r);
-    } catch (e) { showSignin('Could not reach the training server. Check your connection and try again.'); }
+    if (!sessionStorage.getItem(OPENED)) { sessionStorage.setItem(OPENED, '1'); call('open', { session: s.token }).catch(() => {}); }
+    enter(s);
   }
 
+  // ── fallback sign-in ──────────────────────────────────
   let t = null;
   $('q').addEventListener('input', () => {
     clearTimeout(t); pickedId = null; $('last4Box').hidden = true;
@@ -118,22 +383,16 @@
         const box = $('matches'); box.textContent = '';
         if (!r.ok) { $('err').textContent = 'Too many tries right now. Please wait a few minutes.'; return; }
         $('err').textContent = '';
-        r.matches.forEach(m => {
-          const b = document.createElement('button');
-          b.className = 'match'; b.textContent = m.label;
-          b.onclick = () => { pickedId = m.id; $('last4Box').hidden = false; $('last4').focus(); };
-          box.appendChild(b);
-        });
+        r.matches.forEach(m => box.appendChild(h('button', { class: 'match', onclick: () => { pickedId = m.id; $('last4Box').hidden = false; $('last4').focus(); } }, m.label)));
         if (!r.matches.length) box.textContent = 'No match. Check the spelling, or ask camp for your link.';
       } catch (e) { $('err').textContent = 'Could not reach the training server.'; }
     }, 300);
   });
-
   $('go').addEventListener('click', async () => {
     $('err').textContent = '';
     try {
       const r = await call('signin', { id: pickedId, last4: $('last4').value.trim() });
-      if (r.ok) { store(r); sessionStorage.setItem(OPENED, '1'); return showHome(r); }
+      if (r.ok) { store(r); sessionStorage.setItem(OPENED, '1'); return enter(r.session); }
       $('err').textContent = r.error === 'locked'
         ? (r.dayLocked ? 'Too many tries today. Please use your personal link or try again tomorrow.'
                        : 'Too many tries. Please wait ' + (r.minutes || 15) + ' minutes and try again.')
@@ -143,9 +402,10 @@
   });
 
   $('signout').addEventListener('click', () => {
-    localStorage.removeItem(KEY); sessionStorage.removeItem(OPENED);
-    $('greeting').textContent = 'Sign in to begin'; $('pathChip').hidden = true; $('q').value = '';
-    $('matches').textContent = ''; $('last4Box').hidden = true; showSignin();
+    localStorage.removeItem(KEY); sessionStorage.removeItem(OPENED); session = null;
+    $('q').value = ''; $('matches').textContent = ''; $('last4Box').hidden = true;
+    $('absentSheet').hidden = true; $('absentBtn').setAttribute('aria-expanded', 'false');
+    history.replaceState(null, '', location.pathname + location.search); showSignin();
   });
 
   boot();

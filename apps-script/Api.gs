@@ -25,6 +25,8 @@ function handle_(req) {
     case 'signin':   return signinLast4_(req);
     case 'me':       return me_(req);
     case 'open':     return openEvent_(req);
+    case 'home':     return home_(req);
+    case 'step':     return step_(req);
     default:         return { ok: false, error: 'unknown_action' };
   }
 }
@@ -150,6 +152,59 @@ function signinLast4_(req) {
 function me_(req) {
   var s = verifySession_(req.session);
   return s ? Object.assign({ ok: true }, profile_(s)) : { ok: false, error: 'session' };
+}
+
+function readProgress_(staffId) {
+  var sh = ss_().getSheetByName(TRAIN.TAB_PROGRESS);
+  var n = sh.getLastRow() - 1;
+  if (n < 1) return [];
+  return sh.getRange(2, 1, n, TRAIN.PROGRESS_HEADERS.length).getValues()
+    .filter(function (r) { return String(r[0]) === staffId; })
+    .map(function (r) { return { moduleId: String(r[1]), step: String(r[2]), status: String(r[3]), testedOut: String(r[4]),
+      score: r[5] === '' ? null : Number(r[5]), attempts: Number(r[6]) || 0, completedAt: String(r[7]) }; });
+}
+
+function readConfig_() {
+  var rows = ss_().getSheetByName(TRAIN.TAB_CONFIG).getDataRange().getValues().slice(1);
+  var out = { dueDate: '2027-06-19', whatsnew: [] };
+  rows.forEach(function (r) {
+    if (r[0] === 'setting' && r[1] === 'dueDate' && /^\d{4}-\d{2}-\d{2}$/.test(String(r[2]))) out.dueDate = String(r[2]);
+    if (r[0] === 'whatsnew' && r[1]) out.whatsnew.push({ item: String(r[1]), description: String(r[2]), moduleId: String(r[3]), section: String(r[4]) });
+  });
+  return out;
+}
+
+function home_(req) {
+  var s = verifySession_(req.session);
+  if (!s) return { ok: false, error: 'session' };
+  var cfg = readConfig_();
+  return Object.assign({ ok: true, progress: readProgress_(s.staffId), whatsnew: cfg.whatsnew, dueDate: cfg.dueDate,
+    surveySubmitted: s.surveySubmitted === 'Yes' }, profile_(s));
+}
+
+// Marks one step done (idempotent). Stage 4 extends this with check scores and test-outs.
+function step_(req) {
+  var s = verifySession_(req.session);
+  if (!s) return { ok: false, error: 'session' };
+  var moduleId = String(req.moduleId || ''), step = String(req.step || '');
+  if (!/^[a-z0-9-]{2,30}$/.test(moduleId) || ['watch', 'read', 'check', 'do'].indexOf(step) < 0) return { ok: false, error: 'bad_request' };
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var sh = ss_().getSheetByName(TRAIN.TAB_PROGRESS);
+    var n = sh.getLastRow() - 1, found = false, at = new Date().toISOString();
+    if (n > 0) {
+      var vals = sh.getRange(2, 1, n, 3).getValues();
+      for (var i = 0; i < vals.length; i++) {
+        if (String(vals[i][0]) === s.staffId && String(vals[i][1]) === moduleId && String(vals[i][2]) === step) { found = true; break; }
+      }
+    }
+    if (!found) {
+      sh.appendRow([s.staffId, moduleId, step, 'done', '', '', '', at]);
+      logEvent_(s.staffId, moduleId === 'whatsnew' ? 'whatsnew' : 'step', moduleId);
+    }
+  } finally { lock.releaseLock(); }
+  return { ok: true };
 }
 
 function openEvent_(req) {

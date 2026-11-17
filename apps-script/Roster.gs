@@ -242,7 +242,45 @@ function onOpen() {
     .addItem('Create links for new rows', 'menuCreateLinks')
     .addItem('Reset link for selected row', 'menuResetLink')
     .addItem('Rebuild all links for the current address', 'menuRebuildLinks')
+    .addItem('Unlock selected person (sign-in lockout)', 'menuUnlock')
+    .addItem("Add starting 'What's new' items", 'menuSeedWhatsNew')
     .addToUi();
+}
+
+function menuUnlock() {
+  var ui = SpreadsheetApp.getUi();
+  var sh = ss_().getActiveSheet();
+  var row = sh.getActiveCell().getRow();
+  if (sh.getName() !== TRAIN.ROSTER_TAB || row < 2) { ui.alert('Select a counselor row on the ' + TRAIN.ROSTER_TAB + ' tab first.'); return; }
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var r = readRoster_().filter(function (x) { return x.row === row; })[0];
+    var staff = readStaff_();
+    var s = staff.filter(function (x) { return x.email === normalizeEmail_(r && r.email); })[0];
+    if (!s) { ui.alert('That row has no training record yet. Run "Create links for new rows" first.'); return; }
+    s.failCount = 0; s.lockUntil = 0; s.dayFails = 0; s.dayKey = '';
+    writeStaff_(staff);
+    ui.alert(s.displayName + ' can try signing in again.');
+  } finally { lock.releaseLock(); }
+}
+
+// Starting list from the course plan — Dennis edits/extends it in the T_Config tab.
+function menuSeedWhatsNew() {
+  var ui = SpreadsheetApp.getUi();
+  ensureTabs_();
+  var sh = ss_().getSheetByName(TRAIN.TAB_CONFIG);
+  var existing = sh.getDataRange().getValues().filter(function (r) { return r[0] === 'whatsnew'; });
+  if (existing.length) { ui.alert('T_Config already has ' + existing.length + " 'What's new' item(s). Edit them there."); return; }
+  var rows = [
+    ['whatsnew', '"All Done" button', 'Tap it at the end of the afternoon run, once you are off the bus and the last camper is dropped off.', 'p2-alldone', ''],
+    ['whatsnew', '"What if..?" help tool', 'Quick answers for problems on the bus, right inside the app.', 'p2-whatif', ''],
+    ['whatsnew', 'Staff absence procedure', 'Always fill out the absence form. Under 24 hours, ALSO call or text camp.', 'p1-welcome', ''],
+    ['whatsnew', 'Failed texts stay in the box', 'If a text does not send, it stays in the box so you can resend it.', 'p2-texting', ''],
+    ['whatsnew', 'Training link by text', 'Camp now texts you your personal training link.', 'p1-welcome', ''],
+  ];
+  sh.getRange(sh.getLastRow() + 1, 1, rows.length, 5).setNumberFormat('@').setValues(rows);
+  ui.alert('Added ' + rows.length + " starting items to T_Config. Edit or add rows there; 'moduleId' decides which module gets the New for 2027 badge.");
 }
 
 function menuCreateLinks() {
