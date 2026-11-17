@@ -72,7 +72,7 @@ function audioFor(scene) {
   });
   await ctx.addInitScript(FX);
   await ctx.addInitScript(() => localStorage.setItem('dkSession', JSON.stringify({
-    busNumber: '5', token: 'practice-token', staffName: 'Sam', role: 'Counselor', loginExpiry: Date.now() + 9e10 })));
+    busNumber: '58', token: 'practice-token', staffName: 'Sam', role: 'Counselor', loginExpiry: Date.now() + 9e10 })));
   const page = await ctx.newPage();
   await page.clock.setFixedTime(new Date('2027-07-14T08:05:00-04:00'));
   const errors = []; page.on('pageerror', e => errors.push(e.message));

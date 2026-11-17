@@ -46,7 +46,7 @@ function createFakeServer(pwaDir) {
         if (p === '/api/client-config') return send(res, 200, { token: 'practice-token', trainingMode: false });
         if (p === '/api/config') return send(res, 200, {});
         if (p === '/api/contacts') return send(res, 200, {
-          busName: 'Bus 5', busNumber: '5', busGroup: 'LOCAL', session: 'Week 3 · Jul 12-16', weekNumber: 3, demoMode: false,
+          busName: 'Bus 58', busNumber: '58', busGroup: 'LOCAL', session: 'Week 3 · Jul 12-16', weekNumber: 3, demoMode: false,
           preparedMessages: { type: 'individual', label: 'On my way (5 min)',
             message: 'Deerkill Bus : On our way to your stop — see you in about 5 minutes!' },
           contacts: contacts() });
