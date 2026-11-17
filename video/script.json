@@ -1,0 +1,14 @@
+{
+  "id": "p2-texting",
+  "title": "Texting one family",
+  "scenes": [
+    { "n": 1, "text": "Hi there, bus counselor! Let's learn the friendliest part of your day: texting a family." },
+    { "n": 2, "text": "Open Bus Comms on your own phone, and there's every family on your bus. In a hurry? Just start typing a camper's or parent's name." },
+    { "n": 3, "text": "Tap a family, and their thread opens. Everything you've sent them today is right here." },
+    { "n": 4, "text": "Type your message. Keep it short, kind and clear. Like: 'Hi! Maya's bus is running about ten minutes late. Everyone's okay!'" },
+    { "n": 5, "text": "Tap the arrow. When you see 'Sent' with a check mark, it's on its way." },
+    { "n": 6, "text": "No signal? No worries! If a text doesn't go through, it stays right there in the box. Just tap the arrow again when you're back online." },
+    { "n": 7, "text": "Every bus also has Quick Message, ready-made texts for the updates you send most. Look for it on your bus screen, and send it with one tap." },
+    { "n": 8, "text": "One last thing: text families only through Bus Comms. Never tap a phone number in CampInTouch, because that calls from your own phone. Thanks for taking such good care of our campers!" }
+  ]
+}
