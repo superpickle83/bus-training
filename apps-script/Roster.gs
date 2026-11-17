@@ -14,7 +14,7 @@ var TRAIN = {
   STAFF_HEADERS: ['staffId', 'email', 'displayName', 'bus', 'staffYears', 'path', 'tokenHash', 'last4Hash',
     'salt', 'active', 'createdAt', 'sessionVer', 'failCount', 'lockUntil', 'dayKey', 'dayFails', 'surveySubmitted'],
   PROGRESS_HEADERS: ['staffId', 'moduleId', 'step', 'status', 'testedOut', 'score', 'attempts', 'completedAt'],
-  EVENTS_HEADERS: ['staffId', 'type', 'moduleId', 'at'],
+  EVENTS_HEADERS: ['staffId', 'type', 'moduleId', 'at', 'detail'],
   CONFIG_HEADERS: ['kind', 'item', 'description', 'moduleId', 'section'],
   FB_MODULE_HEADERS: ['at', 'moduleId', 'clear', 'comment', 'staffId'],
   FB_SURVEY_HEADERS: ['at', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'followUp', 'staffId'],
@@ -165,6 +165,9 @@ function ensureTab_(name, headers) {
     sh.setFrozenRows(1);
     sh.getRange(1, 1, sh.getMaxRows(), headers.length).setNumberFormat('@'); // keep hashes as text
   }
+  // Older tabs get any newly added trailing headers (new columns always go at the end).
+  var have = sh.getLastColumn();
+  if (have < headers.length) sh.getRange(1, have + 1, 1, headers.length - have).setValues([headers.slice(have)]).setFontWeight('bold');
   return sh;
 }
 function ensureTabs_() {
@@ -276,7 +279,7 @@ function menuSeedWhatsNew() {
     ['whatsnew', '"All Done" button', 'Tap it at the end of the afternoon run, once you are off the bus and the last camper is dropped off.', 'p2-alldone', ''],
     ['whatsnew', '"What if..?" help tool', 'Quick answers for problems on the bus, right inside the app.', 'p2-whatif', ''],
     ['whatsnew', 'Staff absence procedure', 'Always fill out the absence form. Under 24 hours, ALSO call or text camp.', 'p1-welcome', ''],
-    ['whatsnew', 'Failed texts stay in the box', 'If a text does not send, it stays in the box so you can resend it.', 'p2-texting', ''],
+    ['whatsnew', 'Failed texts stay in the box', 'If a text does not send, it stays in the box so you can resend it.', 'p2-texting', 'scene6'],
     ['whatsnew', 'Training link by text', 'Camp now texts you your personal training link.', 'p1-welcome', ''],
   ];
   sh.getRange(sh.getLastRow() + 1, 1, rows.length, 5).setNumberFormat('@').setValues(rows);

@@ -27,6 +27,8 @@ function handle_(req) {
     case 'open':     return openEvent_(req);
     case 'home':     return home_(req);
     case 'step':     return step_(req);
+    case 'answer':   return answer_(req);
+    case 'rate':     return rate_(req);
     default:         return { ok: false, error: 'unknown_action' };
   }
 }
@@ -106,8 +108,8 @@ function globalThrottle_() {
   return true;
 }
 
-function logEvent_(staffId, type, moduleId) {
-  ss_().getSheetByName(TRAIN.TAB_EVENTS).appendRow([staffId, type, moduleId || '', new Date().toISOString()]);
+function logEvent_(staffId, type, moduleId, detail) {
+  ss_().getSheetByName(TRAIN.TAB_EVENTS).appendRow([staffId, type, moduleId || '', new Date().toISOString(), detail || '']);
 }
 
 function sessionFor_(s) {
@@ -182,7 +184,8 @@ function home_(req) {
     surveySubmitted: s.surveySubmitted === 'Yes' }, profile_(s));
 }
 
-// Marks one step done (idempotent). Stage 4 extends this with check scores and test-outs.
+// Marks one step done. Check steps also record score + attempts; watch/read can be flagged testedOut,
+// which the server only allows after a perfect first-try check for that module.
 function step_(req) {
   var s = verifySession_(req.session);
   if (!s) return { ok: false, error: 'session' };
@@ -192,18 +195,53 @@ function step_(req) {
   lock.waitLock(20000);
   try {
     var sh = ss_().getSheetByName(TRAIN.TAB_PROGRESS);
-    var n = sh.getLastRow() - 1, found = false, at = new Date().toISOString();
-    if (n > 0) {
-      var vals = sh.getRange(2, 1, n, 3).getValues();
-      for (var i = 0; i < vals.length; i++) {
-        if (String(vals[i][0]) === s.staffId && String(vals[i][1]) === moduleId && String(vals[i][2]) === step) { found = true; break; }
-      }
+    var n = sh.getLastRow() - 1, at = new Date().toISOString();
+    var vals = n > 0 ? sh.getRange(2, 1, n, TRAIN.PROGRESS_HEADERS.length).getValues() : [];
+    var rowOf = function (st) {
+      for (var i = 0; i < vals.length; i++) if (String(vals[i][0]) === s.staffId && String(vals[i][1]) === moduleId && String(vals[i][2]) === st) return i;
+      return -1;
+    };
+    var testedOut = '';
+    if (req.testedOut === true && (step === 'watch' || step === 'read')) {
+      var c = rowOf('check');
+      if (c < 0 || Number(vals[c][5]) !== 100) return { ok: false, error: 'not_eligible' };
+      testedOut = 'Yes';
     }
-    if (!found) {
-      sh.appendRow([s.staffId, moduleId, step, 'done', '', '', '', at]);
-      logEvent_(s.staffId, moduleId === 'whatsnew' ? 'whatsnew' : 'step', moduleId);
+    var score = '', attempts = '';
+    if (step === 'check') {
+      var sc = Number(req.score), at2 = Number(req.attempts);
+      if (!(sc >= 0 && sc <= 100) || !(at2 >= 1 && at2 <= 50)) return { ok: false, error: 'bad_request' };
+      score = Math.round(sc); attempts = Math.round(at2);
+    }
+    var i = rowOf(step);
+    if (i < 0) {
+      sh.appendRow([s.staffId, moduleId, step, 'done', testedOut, score, attempts, at]);
+      logEvent_(s.staffId, moduleId === 'whatsnew' ? 'whatsnew' : 'step', moduleId, step + (testedOut ? ':testedOut' : ''));
+    } else if (step === 'check') {
+      // First score is kept; later retakes only add attempts.
+      sh.getRange(i + 2, 7).setValue(String((Number(vals[i][6]) || 0) + attempts));
     }
   } finally { lock.releaseLock(); }
+  return { ok: true };
+}
+
+function answer_(req) {
+  var s = verifySession_(req.session);
+  if (!s) return { ok: false, error: 'session' };
+  var moduleId = String(req.moduleId || ''), qid = String(req.qid || ''), choice = String(req.choice || '');
+  if (!/^[a-z0-9-]{2,30}$/.test(moduleId) || !/^q[0-9]{1,2}$/.test(qid) || !/^[A-D]$/.test(choice)) return { ok: false, error: 'bad_request' };
+  logEvent_(s.staffId, 'answer', moduleId, qid + ':' + choice + ':' + (req.correct === true ? '1' : '0'));
+  return { ok: true };
+}
+
+// Anonymous by design: no staffId is stored with a module rating.
+function rate_(req) {
+  var s = verifySession_(req.session);
+  if (!s) return { ok: false, error: 'session' };
+  var moduleId = String(req.moduleId || '');
+  if (!/^[a-z0-9-]{2,30}$/.test(moduleId) || (req.clear !== 'Yes' && req.clear !== 'No')) return { ok: false, error: 'bad_request' };
+  var comment = String(req.comment || '').slice(0, 500);
+  ss_().getSheetByName(TRAIN.TAB_FB_MODULE).appendRow([new Date().toISOString(), moduleId, req.clear, comment, '']);
   return { ok: true };
 }
 

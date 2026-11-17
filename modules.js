@@ -9,7 +9,8 @@ window.TRAIN_MODULES = [
   { id: 'p1-arrivals',   part: 1, title: 'Arrivals, Departures & Drop-Offs',         steps: ['read', 'check', 'do'], minutes: 10, testOut: true },
   { id: 'p2-login',      part: 2, title: 'Welcome & logging in',                     steps: ['watch', 'check'],      minutes: 4,  testOut: true },
   { id: 'p2-screen',     part: 2, title: 'Reading your bus screen',                  steps: ['watch', 'check'],      minutes: 4,  testOut: true },
-  { id: 'p2-texting',    part: 2, title: 'Texting one family',                       steps: ['watch', 'check', 'do'], minutes: 6, testOut: true },
+  // 'do' (practice bus app) is added when Stage 5 exists.
+  { id: 'p2-texting',    part: 2, title: 'Texting one family',                       steps: ['watch', 'check'],       minutes: 6, testOut: true },
   { id: 'p2-broadcast',  part: 2, title: 'Broadcasting to the whole bus',            steps: ['watch', 'check', 'do'], minutes: 5, testOut: true },
   { id: 'p2-alerts',     part: 2, title: 'Attendance alerts & the 3-minute rule',    steps: ['watch', 'check', 'do'], minutes: 6, testOut: true },
   { id: 'p2-gps',        part: 2, title: 'GPS & Share My Location',                  steps: ['watch', 'check', 'do'], minutes: 6, testOut: true },

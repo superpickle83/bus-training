@@ -203,6 +203,8 @@ function audioFor(scene) {
     parts.forEach(p => { const d = s.audioDur * p.length / chars; vtt += `${ts(t)} --> ${ts(t + d)}\n${p.trim()}\n\n`; t += d; });
   });
   fs.writeFileSync(path.join(OUT, `${script.id}.vtt`), vtt);
+  fs.writeFileSync(path.join(OUT, `${script.id}.json`), JSON.stringify({ id: script.id, title: script.title, duration: +total.toFixed(2),
+    scenes: scenes.map((s, i) => ({ id: 'scene' + s.n, title: s.title, start: +starts[i].toFixed(2), end: +(i + 1 < scenes.length ? starts[i + 1] : total).toFixed(2) })) }, null, 2));
   fs.writeFileSync(path.join(OUT, `${script.id}.poster.jpg`), frames[Math.min(frames.length - 1, 2)].data);
   console.log(`done: ${mp4}  (${total.toFixed(1)}s, ${scenes.every(s => s.real) ? 'your narration' : 'scratch narration'})`);
 })().catch(e => { console.error(e); process.exit(1); });
