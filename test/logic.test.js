@@ -104,7 +104,12 @@ assert(run(`evaluateLast4_(__s0, '${L4}', 5000, 'd2')`).ok, 'cap resets next day
 // name search: first name + last initial only
 ctx.__st = staff;
 const m = run(`matchNames_(__st, 'an a')`);
-assert.deepStrictEqual(m.map(x => x.label), ['Ann A.']);
+assert.deepStrictEqual(m.map(x => x.label), ['Ann A. · Bus 7']);
+ctx.__dup = [
+  { staffId: 'a', displayName: 'Sam Kay', bus: '3', active: 'Yes' },
+  { staffId: 'b', displayName: 'Sam Klein', bus: '12', active: 'Yes' },
+];
+assert.deepStrictEqual(run('matchNames_(__dup, "sam k")').map(x => x.label), ['Sam K. · Bus 3', 'Sam K. · Bus 12']);
 assert.strictEqual(run(`matchNames_(__st, 'a')`).length, 0, 'one letter returns nothing');
 assert(!JSON.stringify(m).includes('@'), 'no email in search results');
 
